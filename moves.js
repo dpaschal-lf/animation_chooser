@@ -22,7 +22,8 @@ var moves = {
 		name: 'turnaround',
 		number_of_frames : 9,
 		frame_height : 98,
-		frame_widths : [25, 35, 35, 40, 47, 52, 45, 40, 49],
+		frame_numbers: [ 0,  1,  2,  3,  4,  5,  6,  7,  8],
+		frame_widths : [37, 35, 35, 40, 47, 52, 45, 40, 49],
 		leadout_animations : [
 			{
 				weight: 2,
@@ -36,7 +37,8 @@ var moves = {
 		name: 'standing_jump',
 		number_of_frames : 17,
 		frame_height : 114,
-		frame_widths : [50, 38, 53, 57, 73, 72, 64, 76, 103, 115, 98, 69, 52, 68, 58, 51, 46],
+		frame_numbers: [ 0,  1,  2,  3,  4,  5,  6,  7,   8,   9, 10, 11, 12, 13, 14, 15, 16],
+		frame_widths : [53, 44, 53, 53, 73, 72, 64, 76, 103, 115, 98, 69, 52, 68, 58, 51, 46],
 		leadout_animations : [
 			{
 				weight: 1,
@@ -53,11 +55,12 @@ var animator_template = function(moves, canvas){
 	self.moves = moves;
 	self.current_move = self.moves.default;
 	self.current_frame = 0;
-	self.time_per_frame = 100;
+	self.time_per_frame = 500;
 	self.current_framepoint = 0;
 	self.timer = null;
 	self.total_frames  = 0;
 	self.max_frames = 120; //testing value
+	self.playing = false;
 	self.init = function(){
 		console.log('initing');
 		/*
@@ -106,7 +109,12 @@ var animator_template = function(moves, canvas){
 		var random = Math.floor(Math.random()*(max-min))+min;
 		return random;
 	}
+	self.stop_animating = function(){
+		self.playing=false;
+		self.stop_heartbeat();
+	}
 	self.start_animating = function(){
+		self.playing=true;
 		self.start_heartbeat();
 	}
 	self.start_heartbeat = function(){
@@ -140,25 +148,38 @@ var animator_template = function(moves, canvas){
 			self.load_image(self.current_move);
 		}
 		else{
-			self.current_framepoint += self.current_move.frame_widths[self.current_frame];
+			self.current_framepoint -= self.current_move.frame_widths[self.current_frame];
 		}
 		self.current_frame = next_frame;
 		console.log("next frame is ",self.current_frame);
+		$("#sprite_label").text(self.current_frame);
 		self.get_animation_frame();
 		//self.get_animation_frame();
-		self.start_heartbeat();
+		if(self.playing){
+			self.start_heartbeat();
+		}
 	}
 	self.load_image = function(move){
 		self.canvas.css({
 			'background-image' : 'url('+move.file+')',
 			'height': move.frame_height + 'px',
-			'width': move.frame_widths + 'px'
-		})
+			'width': move.frame_widths[self.current_move.current_framepoint] + 'px'
+		});
+		console.log('height: ',move.frame_height);
+	}
+	self.toggle_play = function(){
+		if(self.timer!=null){
+			self.stop_heartbeat();
+		} else {
+			self.start_heartbeat();
+		}
 	}
 
 	self.get_animation_frame = function(){
+		console.log('setting to '+self.current_move.frame_widths[self.current_frame]+'px');
 		self.canvas.css({
-			'background-position' : self.current_framepoint + 'px'
+			'background-position' : self.current_framepoint + 'px',
+			width: self.current_move.frame_widths[self.current_frame]+'px'
 		});
 	}
 	self.get_animation_frame_end = function(){
