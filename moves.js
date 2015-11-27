@@ -5,6 +5,9 @@ var moves = {
 		number_of_frames : 1,
 		frame_height : 98,
 		frame_widths : [25],
+		reversible: false,
+		reverses, false,
+		default_direction: 'left',
 		leadout_animations : [
 			{
 				weight: 2,
@@ -22,6 +25,9 @@ var moves = {
 		name: 'turnaround',
 		number_of_frames : 9,
 		frame_height : 98,
+		reversible: true,
+		reverses: true,
+		default_direction: 'left',
 		frame_numbers: [ 0,  1,  2,  3,  4,  5,  6,  7,  8],
 		frame_widths : [37, 35, 35, 40, 47, 52, 45, 40, 49],
 		leadout_animations : [
@@ -37,6 +43,9 @@ var moves = {
 		name: 'standing_jump',
 		number_of_frames : 17,
 		frame_height : 114,
+		reversible: true,
+		reverses, false,
+		default_direction: 'left',
 		frame_numbers: [ 0,  1,  2,  3,  4,  5,  6,  7,   8,   9, 10, 11, 12, 13, 14, 15, 16],
 		frame_widths : [53, 44, 53, 53, 73, 72, 64, 76, 103, 115, 98, 69, 52, 68, 58, 51, 46],
 		leadout_animations : [
@@ -55,12 +64,14 @@ var animator_template = function(moves, canvas){
 	self.moves = moves;
 	self.current_move = self.moves.default;
 	self.current_frame = 0;
-	self.time_per_frame = 500;
+	self.time_per_frame = 60;
 	self.current_framepoint = 0;
 	self.timer = null;
 	self.total_frames  = 0;
 	self.max_frames = 120; //testing value
 	self.playing = false;
+	self.direction = 'left';
+	self.speed = 'normal';
 	self.init = function(){
 		console.log('initing');
 		/*
@@ -88,6 +99,14 @@ var animator_template = function(moves, canvas){
 		}
 		//console.log(self.moves);
 	}
+	self.alternate_direction = function(){
+		if(self.direction == 'left'){
+			self.direction = 'right';
+		}
+		else{
+			self.direction = 'left';
+		}
+	}
 	self.choose_next_move = function(){
 		//console.log('choosing next move')
 		var option_count = self.current_move.choice_array.length;
@@ -108,6 +127,9 @@ var animator_template = function(moves, canvas){
 	self.get_random = function(min,max){
 		var random = Math.floor(Math.random()*(max-min))+min;
 		return random;
+	}
+	self.reverse_actor = function(){
+		self.canvas.toggleClass('reverse');
 	}
 	self.stop_animating = function(){
 		self.playing=false;
