@@ -1,4 +1,4 @@
-//trying something new, blah blah blah
+//trying something new, blah blah 
 var moves = {
 	default : {
 		file : 'test_images/prince/turnaround.png',
