@@ -1,3 +1,4 @@
+//comment
 var moves = {
 	default : {
 		file : 'test_images/prince/turnaround.png',
